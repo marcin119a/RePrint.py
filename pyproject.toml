@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reprint-tool"
+version = "0.1.0"
+description = "Tool to compute DNA Repair FootPrint (RePrint) from COSMIC signatures"
+authors = [{ name = "Damian Wójtowicz, Marcin Wierzbinski", email = "d.wojtowicz@uw.edu.pl" }]
+license = {text = "MIT"}
+readme = "README.md"
+dependencies = [
+    "numpy",
+    "pandas"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov"
+]
