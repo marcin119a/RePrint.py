@@ -17,7 +17,7 @@ You need Python 3.8 or newer.
 Install dependencies:
 
 ```bash
-pip install numpy pandas plotly Pillow
+pip install numpy pandas plotly kaleido Pillow
 ```
 
 For development and testing:
@@ -43,7 +43,7 @@ python main.py --input path/to/input_signatures.tsv --output_dir pdfs --prefix r
 ### 2. Save all plots in a single multi-page PDF
 
 ```bash
-python main.py --input path/to/input_signatures.tsv --prefix reprint_ --sep '\t'
+python main.py --input path/to/input_signatures.tsv all_signatures.pdf --prefix reprint_ --sep '\t'
 ```
 
 - `--save_reprint` – (optional) path to save the computed RePrint matrix as CSV/TSV
