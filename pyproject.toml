@@ -13,7 +13,6 @@ dependencies = [
     "numpy",
     "pandas",
     "plotly",
-    "kaleido",
     "Pillow"
 ]
 

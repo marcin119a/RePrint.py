@@ -1,7 +1,6 @@
 import plotly.graph_objects as go
 
 
-
 def create_main_dashboard(df, signature, title, yaxis_title):
     frequencies = df[signature] * 1
 
