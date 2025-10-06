@@ -6,7 +6,8 @@
 
 - Computes RePrint (DNA repair footprint) from input signature matrices (e.g., COSMIC).
 - Generates barplot visualizations for each signature.
-- Exports all plots as separate PDF files or as a single multi-page PDF.
+- Exports all plots as separate PDF files and optionally PNG files.
+- Generates and exports a similarity heatmap (dendrogram + optional heatmap) as PNG.
 - Can save the computed RePrint matrix to a CSV/TSV file.
 - Command-line interface for easy batch processing.
 
@@ -40,15 +41,44 @@ python main.py --input path/to/input_signatures.tsv --output_dir pdfs --prefix r
 - `--sep` – column separator in input file (default: tab)
 - `--save_reprint` – (optional) path to save the computed RePrint matrix as CSV/TSV
 
-### 2. Save all plots in a single multi-page PDF
+### 2. Also export per-signature PNG files
 
 ```bash
-python main.py --input path/to/input_signatures.tsv all_signatures.pdf --prefix reprint_ --sep '\t'
+python main.py \
+  --input path/to/input_signatures.tsv \
+  --output_dir pdfs \
+  --prefix reprint_ \
+  --sep '\t' \
+  --export_png
 ```
 
-- `--save_reprint` – (optional) path to save the computed RePrint matrix as CSV/TSV
+This will save both PDFs and PNGs for each signature into `--output_dir`.
 
-### 3. Save only the computed RePrint matrix (no plots)
+### 3. Generate and save similarity heatmap as PNG
+
+You can generate a dendrogram-based similarity view across signatures and save it as PNG:
+
+```bash
+python main.py \
+  --input path/to/input_signatures.tsv \
+  --output_dir pdfs \
+  --prefix reprint_ \
+  --sep '\t' \
+  --analyze_png pdfs/all_signatures.png \
+  --analyze_metric rmse \
+  --analyze_colorscale Blues \
+  --analyze_method complete
+```
+
+Options:
+
+- `--analyze_png` – output PNG path for the heatmap/dendrogram figure
+- `--analyze_metric` – similarity metric: `rmse` (default) or `cosine`
+- `--analyze_colorscale` – Plotly colorscale name (default: `Blues`)
+- `--analyze_hide_heatmap` – include only dendrograms (no heatmap)
+- `--analyze_method` – clustering linkage method (e.g., `complete`, `average`)
+
+### 4. Save only the computed RePrint matrix (no plots)
 
 ```bash
 python main.py --input path/to/input_signatures.tsv --save_reprint reprint_matrix.tsv --sep '\t'

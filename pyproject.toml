@@ -14,7 +14,8 @@ dependencies = [
     "pandas",
     "plotly",
     "kaleido",
-    "Pillow"
+    "Pillow",
+    "scipy"
 ]
 
 [project.optional-dependencies]
