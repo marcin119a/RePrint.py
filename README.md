@@ -18,7 +18,7 @@ You need Python 3.8 or newer.
 Install dependencies:
 
 ```bash
-pip install numpy pandas plotly kaleido Pillow
+pip install numpy pandas plotly kaleido Pillow  scipy
 ```
 
 For development and testing:
