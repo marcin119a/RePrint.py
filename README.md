@@ -11,6 +11,12 @@
 - Can save the computed RePrint matrix to a CSV/TSV file.
 - Command-line interface for easy batch processing.
 
+## Demo
+
+Try the interactive demo on Google Colab:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1XLEvSDd9vCTwiiHCA0Nk1ASAmoXm5m8A?usp=sharing)
+
 ## Installation
 
 You need Python 3.8 or newer.
