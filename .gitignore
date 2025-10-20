@@ -64,3 +64,4 @@ doxygen_sqlite3.db
 
 # PDF files
 pdfs/ 
+output/

@@ -110,7 +110,7 @@ A[C>A]C 0.0091         0.00061        ...
 ## Example
 
 ```bash
-python main.py --input tests/data/input_COSMIC_v2_SBS_GRCh37.txt --prefix reprint_ --sep '\t' --save_reprint pdfs/reprint_matrix.tsv
+python main.py --input tests/data/COSMIC_v2_SBS_GRCh37.txt --prefix reprint_ --sep '\t' --save_reprint output/reprint_matrix.tsv
 ```
 
 ## Project Structure

@@ -13,7 +13,7 @@ from reprint_tool.analyze import (
 def main():
     parser = argparse.ArgumentParser(description="Generate PDF plots for all signatures in a DataFrame.")
     parser.add_argument('--input', required=True, help='Path to input CSV/TSV file (with signatures as columns)')
-    parser.add_argument('--output_dir', default='.', help='Directory to save PDF files (default: current directory)')
+    parser.add_argument('--output_dir', default='output', help='Directory to save PDF files (default: output)')
     parser.add_argument('--prefix', default='reprint_', help='Prefix for output PDF files (default: reprint_)')
     parser.add_argument('--sep', default='\t', help='Column separator in input file (default: tab)')
     parser.add_argument('--save_reprint', default=None, help='If set, save computed reprint DataFrame to this file (CSV/TSV)')
@@ -24,12 +24,16 @@ def main():
     parser.add_argument('--analyze_hide_heatmap', action='store_true', help='Hide heatmap, show only dendrograms')
     parser.add_argument('--analyze_method', default='complete', help='Linkage method for clustering (e.g., complete, average)')
     args = parser.parse_args()
+    
+    # Convert escape sequences like '\t' to actual tab character
+    sep = args.sep.encode().decode('unicode_escape')
 
-    df = pd.read_csv(args.input, sep=args.sep, index_col=0)
+    df = pd.read_csv(args.input, sep=sep, index_col=0)
     df_reprint = reprint(df)
 
     if args.save_reprint:
-        df_reprint.to_csv(args.save_reprint, sep=args.sep)
+        os.makedirs(os.path.dirname(args.save_reprint) or '.', exist_ok=True)
+        df_reprint.to_csv(args.save_reprint, sep=sep)
         print(f"Saved reprint DataFrame to {args.save_reprint}")
 
    
