@@ -32,4 +32,4 @@ def test_reprint():
     ])
     result = reprint(data)
     assert not result.isnull().values.any()
-    assert set(result.columns) == {'SigA', 'SigB'}
+    assert set(result.columns) == {'SigA_reprint', 'SigB_reprint'}
