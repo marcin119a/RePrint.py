@@ -48,4 +48,6 @@ def reprint(data, epsilon=10e-4):
 
     # Convert the reprint_probabilities dictionary to a DataFrame for better readability
     reprint_df = pd.DataFrame(reprint_probabilities)
+    # Add suffix to column names
+    reprint_df.columns = [col + '_reprint' for col in reprint_df.columns]
     return reprint_df
