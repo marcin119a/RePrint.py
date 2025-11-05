@@ -105,7 +105,7 @@ def create_heatmap_with_custom_sim(df, calc_func=calculate_rmse, colorscale='Blu
                              'zeroline': False,
                              'showticklabels': True,
                              'tickvals': dendro_side['layout']['yaxis']['tickvals'],
-                             'ticktext': [labels[i] + '_reprint' for i in dendro_leaves],
+                             'ticktext': [labels[i] + '' for i in dendro_leaves],
                              'side': 'right',
                              })
 
