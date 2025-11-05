@@ -84,7 +84,7 @@ def create_heatmap_with_custom_sim(df, calc_func=calculate_rmse, colorscale='Blu
                                 'zeroline': False,
                                 'side': 'top',  # Ustawienie etykiet osi X na górze
                                 'tickvals': fig['layout']['xaxis']['tickvals'],
-                                'ticktext': [labels[i] + '_reprint' for i in dendro_leaves]
+                                'ticktext': [labels[i] + '' for i in dendro_leaves]
                                 })
 
         fig.update_layout(xaxis2={'domain': [0, .15],
