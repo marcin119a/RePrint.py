@@ -106,7 +106,7 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
     x_pos_c = np.arange(16)
     x_pos_t = np.arange(16) + 16.5
     x_pos = np.concatenate([x_pos_c, x_pos_t])
-    width = 0.8
+    width = 0.95  # Increased width to reduce gap between bars
     
     # All panels use the same scale: 0 to 1.0
     # Each column's three bars will sum to 1.0 in total height
@@ -171,7 +171,7 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
     legend_y_bot = panel_bottom + panel_height * 0.4  # ~0.19
     legend_y_mid = panel_bottom + panel_height * 1.4  # ~0.47
     legend_y_top = panel_bottom + panel_height * 2.4  # ~0.75
-    legend_x_left = 0.03  # Moved closer to plot
+    legend_x_left = 0.06  # Moved closer to plot
     legend_x_right = 0.97  # Moved closer to plot
     
     def add_fig_legend(x_pos, y_pos, label, color):
@@ -195,20 +195,20 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
     add_fig_legend(legend_x_right, legend_y_top, 'T>G', COLORS_T[2])
     
     # Add scale indicator showing what 1.0 represents
-    # Place scale on the middle panel (centered) as a reference
+    # Place scale on the bottom panel
     scale_x_pos = max(x_pos) + 1.5  # Just after the last bar
     scale_height = 1.0
     
-    # Draw scale bar on middle panel (centered around 0)
-    ax_mid.plot([scale_x_pos, scale_x_pos], [-scale_height/2, scale_height/2], 
+    # Draw scale bar on bottom panel (from 0 to 1.0)
+    ax_bot.plot([scale_x_pos, scale_x_pos], [0, scale_height], 
                 'k-', linewidth=2, clip_on=False)
-    ax_mid.plot([scale_x_pos - 0.1, scale_x_pos + 0.1], [-scale_height/2, -scale_height/2], 
+    ax_bot.plot([scale_x_pos - 0.1, scale_x_pos + 0.1], [0, 0], 
                 'k-', linewidth=2, clip_on=False)
-    ax_mid.plot([scale_x_pos - 0.1, scale_x_pos + 0.1], [scale_height/2, scale_height/2], 
+    ax_bot.plot([scale_x_pos - 0.1, scale_x_pos + 0.1], [scale_height, scale_height], 
                 'k-', linewidth=2, clip_on=False)
-    ax_mid.text(scale_x_pos + 0.3, 0, '1.0', 
+    ax_bot.text(scale_x_pos + 0.3, scale_height / 2, '1.0', 
                 ha='left', va='center', fontsize=12, fontweight='bold',
-                transform=ax_mid.transData)
+                transform=ax_bot.transData)
     
     # Set white background
     fig.patch.set_facecolor('white')
