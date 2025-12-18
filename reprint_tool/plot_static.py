@@ -206,8 +206,32 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
                 'k-', linewidth=2, clip_on=False)
     ax_bot.plot([scale_x_pos - 0.1, scale_x_pos + 0.1], [scale_height, scale_height], 
                 'k-', linewidth=2, clip_on=False)
-    ax_bot.text(scale_x_pos + 0.3, scale_height / 2, '1.0', 
-                ha='left', va='center', fontsize=12, fontweight='bold',
+    
+    # Add tick marks every 0.25
+    tick_positions = [0, 0.25, 0.5, 0.75, 1.0]
+    tick_length = 0.05
+    for tick_pos in tick_positions:
+        ax_bot.plot([scale_x_pos - tick_length, scale_x_pos + tick_length], [tick_pos, tick_pos], 
+                    'k-', linewidth=1.5, clip_on=False)
+    
+    # Add labels for tick marks
+    #ax_bot.text(scale_x_pos + 0.3, scale_height / 2, '1.0', 
+    #            ha='left', va='center', fontsize=12, fontweight='bold',
+    #            transform=ax_bot.transData)
+    ax_bot.text(scale_x_pos + 0.3, 0, '0', 
+                ha='left', va='center', fontsize=10,
+                transform=ax_bot.transData)
+    ax_bot.text(scale_x_pos + 0.3, 0.25, '0.25', 
+                ha='left', va='center', fontsize=10,
+                transform=ax_bot.transData)
+    ax_bot.text(scale_x_pos + 0.3, 0.5, '0.5', 
+                ha='left', va='center', fontsize=10,
+                transform=ax_bot.transData)
+    ax_bot.text(scale_x_pos + 0.3, 0.75, '0.75', 
+                ha='left', va='center', fontsize=10,
+                transform=ax_bot.transData)
+    ax_bot.text(scale_x_pos + 0.3, 1.0, '1.0', 
+                ha='left', va='center', fontsize=10,
                 transform=ax_bot.transData)
     
     # Set white background

@@ -191,9 +191,9 @@ def create_main_dashboard_horizontal(df, signature, title, yaxis_title):
             col=1
         )
         
-        # Update y-axis for this subplot - hide axes
+        # Update y-axis for this subplot - hide axes, symmetric range
         fig.update_yaxes(
-            range=[-y_range, y_range] if row_idx == 3 else [-y_range, y_range],
+            range=[-y_range, y_range],
             title_text="",
             showticklabels=False,  # Hide tick labels
             showgrid=False,  # Hide grid lines
