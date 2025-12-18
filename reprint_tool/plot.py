@@ -248,6 +248,10 @@ def create_main_dashboard_horizontal(df, signature, title, yaxis_title):
     return fig
 
 import plotly.io as pio
+from matplotlib.backends.backend_pdf import PdfPages
+from PIL import Image
+import matplotlib.pyplot as plt
+import io
 
 def save_all_signatures_to_pdf(df, output_dir=".", prefix="reprint_", yaxis_title="Probabilities"):
     """
@@ -260,9 +264,89 @@ def save_all_signatures_to_pdf(df, output_dir=".", prefix="reprint_", yaxis_titl
         fig = create_main_dashboard(
             df,
             signature=signature,
-            title=f"{prefix}{signature} - Probabilities of Specific Tri-nucleotide Context Mutations by Mutation Type",
+            title=f"{prefix}{signature} - Probabilities of Specific Tri-nucleotide Context Mutations",
             yaxis_title=yaxis_title
         )
         pdf_path = os.path.join(output_dir, f"{prefix}{signature}.pdf")
         fig.write_image(pdf_path, format="pdf")
         print(f"Saved: {pdf_path}")
+
+
+def save_all_signatures_to_single_pdf(df, output_pdf, prefix="", yaxis_title="Probabilities"):
+    """
+    Creates and saves all signature plots in a single PDF file.
+    
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        DataFrame with signatures as columns
+    output_pdf : str
+        Path to output PDF file
+    prefix : str
+        Prefix for signature names in titles
+    yaxis_title : str
+        Title for y-axis
+    """
+    import os
+    import tempfile
+    
+    # Create temporary directory for images
+    temp_dir = tempfile.mkdtemp()
+    
+    try:
+        # Generate all plots as PNG images first
+        image_paths = []
+        for i, signature in enumerate(df.columns, 1):
+            print(f"  Processing {i}/{len(df.columns)}: {signature}")
+            fig = create_main_dashboard(
+                df,
+                signature=signature,
+                title=f"{prefix}{signature} - Probabilities of Specific Tri-nucleotide Context Mutations by Mutation Type",
+                yaxis_title=yaxis_title
+            )
+            
+            # Save as high-resolution PNG temporarily
+            temp_png = os.path.join(temp_dir, f"{signature}.png")
+            try:
+                # Use high resolution: scale=3 gives ~3600x2400 pixels (high quality)
+                fig.write_image(temp_png, format="png", scale=3)
+                image_paths.append(temp_png)
+            except Exception as e:
+                print(f"    Warning: Could not export {signature} as image: {e}")
+                continue
+        
+        # Combine all images into single PDF using matplotlib with high DPI
+        print(f"\nCombining {len(image_paths)} plots into PDF...")
+        with PdfPages(output_pdf) as pdf:
+            for img_path in image_paths:
+                try:
+                    img = Image.open(img_path)
+                    # Convert to RGB if necessary
+                    if img.mode != 'RGB':
+                        img = img.convert('RGB')
+                    
+                    # Get actual image DPI and dimensions
+                    # Plotly default is 72 DPI, with scale=3 we get 216 DPI effectively
+                    # Calculate figure size to maintain aspect ratio at 300 DPI
+                    img_dpi = 216  # Effective DPI from plotly scale=3
+                    img_width_inch = img.width / img_dpi
+                    img_height_inch = img.height / img_dpi
+                    
+                    # Create matplotlib figure matching image size
+                    fig_pdf = plt.figure(figsize=(img_width_inch, img_height_inch), dpi=300)
+                    ax = fig_pdf.add_subplot(111)
+                    ax.imshow(img, aspect='auto', interpolation='bilinear')
+                    ax.axis('off')
+                    # Save with high DPI for best quality
+                    pdf.savefig(fig_pdf, bbox_inches='tight', pad_inches=0, dpi=300)
+                    plt.close(fig_pdf)
+                except Exception as e:
+                    print(f"    Warning: Could not add {img_path} to PDF: {e}")
+                    continue
+        
+        print(f"✓ Combined PDF saved: {output_pdf}")
+        
+    finally:
+        # Clean up temporary files
+        import shutil
+        shutil.rmtree(temp_dir, ignore_errors=True)

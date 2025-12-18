@@ -162,16 +162,17 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
     display_name = reprint_name.replace('reprint_', '')
     fig.suptitle(f'RePrint - {display_name}', fontsize=20, fontweight='bold', y=0.98)
     
-    # Add legends - positioned closer to plot area
+    # Add legends - positioned closer to plot area, aligned to bottom
     # Calculate panel positions in figure coordinates
     # Each panel takes roughly 1/3 of the figure height (excluding title)
     panel_height = 0.28  # Approximate height of each panel in figure coordinates
     panel_bottom = 0.08  # Bottom of bottom panel
     
-    legend_y_bot = panel_bottom + panel_height * 0.4  # ~0.19
-    legend_y_mid = panel_bottom + panel_height * 1.4  # ~0.47
-    legend_y_top = panel_bottom + panel_height * 2.4  # ~0.75
-    legend_x_left = 0.06  # Moved closer to plot
+    # Position legends at bottom of each panel
+    legend_y_bot = panel_bottom + panel_height * 0.1  # Bottom of bottom panel
+    legend_y_mid = panel_bottom + panel_height * 1.1  # Bottom of middle panel
+    legend_y_top = panel_bottom + panel_height * 2.1  # Bottom of top panel
+    legend_x_left = 0.08  # Moved closer to plot
     legend_x_right = 0.97  # Moved closer to plot
     
     def add_fig_legend(x_pos, y_pos, label, color):
