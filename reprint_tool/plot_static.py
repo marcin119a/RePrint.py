@@ -12,9 +12,11 @@ import matplotlib.patches as mpatches
 from matplotlib.backends.backend_pdf import PdfPages
 import sys
 
-# COSMIC-like colors for mutations
-COLORS_C = ['#00BFFF', '#000000', '#E32636']  # C>A (cyan), C>G (black), C>T (red)
-COLORS_T = ['#C0C0C0', '#90EE90', '#FFB6C1']  # T>A (gray), T>C (green), T>G (pink)
+# Unified colors matching plot.py style
+# C mutations: C>A (blue), C>G (black), C>T (red)
+COLORS_C = ['blue', 'black', 'red']
+# T mutations: T>A (gray), T>C (green), T>G (pink)
+COLORS_T = ['gray', 'green', 'pink']
 
 # Define trinucleotide contexts
 BASES = ['A', 'C', 'G', 'T']
@@ -71,7 +73,9 @@ def extract_reprint_vector(df, reprint_name):
     return c_probs, t_probs
 
 
-def plot_reprint_seamless(reprint_name, c_probs, t_probs):
+def plot_reprint_seamless(reprint_name, c_probs, t_probs, 
+                          show_x_labels=True, show_y_labels=False, 
+                          title=None):
     """
     Generate a seamless 3-panel bar chart visualization for a single RePrint.
     
@@ -82,6 +86,7 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
     - Bottom panel: bars aligned at bottom
     - No y-axes, seamless appearance
     - Compact format matching signature plots
+    - Unified styling with signature plots
     
     Parameters:
     -----------
@@ -91,6 +96,12 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
         16x3 array of probabilities for C-centered contexts
     t_probs : np.array
         16x3 array of probabilities for T-centered contexts
+    show_x_labels : bool, optional
+        Whether to show X-axis labels (default: True)
+    show_y_labels : bool, optional
+        Whether to show Y-axis labels (default: False)
+    title : str, optional
+        Custom title. If None, uses reprint_name with "RePrint" prefix (default: None)
     
     Returns:
     --------
@@ -145,58 +156,49 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
     ax_top.set_xticks([])
     ax_mid.set_xticks([])
     
-    # Add x-axis labels to bottom panel only
-    x_labels_formatted = []
-    for label in ALL_CONTEXT_LABELS:
-        left = label[0]
-        center = label[1]
-        right = label[2]
-        formatted = f'{left}$\\mathbf{{{center}}}${right}'
-        x_labels_formatted.append(formatted)
+    # Add x-axis labels to bottom panel only (if enabled)
+    if show_x_labels:
+        x_labels_formatted = []
+        for label in ALL_CONTEXT_LABELS:
+            left = label[0]
+            center = label[1]
+            right = label[2]
+            formatted = f'{left}$\\mathbf{{{center}}}${right}'
+            x_labels_formatted.append(formatted)
+        
+        ax_bot.set_xticks(x_pos)
+        ax_bot.set_xticklabels(x_labels_formatted, rotation=90, ha='right', fontsize=8)
+        ax_bot.tick_params(axis='x', length=0)
+    else:
+        ax_bot.set_xticks([])
+        ax_bot.set_xticklabels([])
     
-    ax_bot.set_xticks(x_pos)
-    ax_bot.set_xticklabels(x_labels_formatted, rotation=90, fontsize=15)
-    ax_bot.tick_params(axis='x', length=0)
+    # Add minimalist title (matching plot.py style)
+    if title is None:
+        # Clean up reprint name - remove common prefixes/suffixes
+        display_name = reprint_name.replace('reprint_', '').replace('_reprint', '')
+        title = f"{display_name} RePrint"
     
-    # Add title
-    display_name = reprint_name.replace('reprint_', '')
-    fig.suptitle(f'RePrint - {display_name}', fontsize=20, fontweight='bold', y=0.98)
+    fig.suptitle(title, fontsize=14, y=0.98)
     
-    # Add legends - positioned closer to plot area, aligned to bottom
-    # Calculate panel positions in figure coordinates
-    # Each panel takes roughly 1/3 of the figure height (excluding title)
-    panel_height = 0.28  # Approximate height of each panel in figure coordinates
-    panel_bottom = 0.08  # Bottom of bottom panel
+    # Add legend in upper right corner (matching plot.py style)
+    # Create legend patches matching plot.py style
+    legend_handles = [
+        mpatches.Patch(color=COLORS_C[0], label='C>A'),
+        mpatches.Patch(color=COLORS_C[1], label='C>G'),
+        mpatches.Patch(color=COLORS_C[2], label='C>T'),
+        mpatches.Patch(color=COLORS_T[0], label='T>A'),
+        mpatches.Patch(color=COLORS_T[1], label='T>C'),
+        mpatches.Patch(color=COLORS_T[2], label='T>G'),
+    ]
     
-    # Position legends at bottom of each panel
-    legend_y_bot = panel_bottom + panel_height * 0.1  # Bottom of bottom panel
-    legend_y_mid = panel_bottom + panel_height * 1.1  # Bottom of middle panel
-    legend_y_top = panel_bottom + panel_height * 2.1  # Bottom of top panel
-    legend_x_left = 0.08  # Moved closer to plot
-    legend_x_right = 0.97  # Moved closer to plot
+    # Position legend in upper right corner (no title, matching plot.py)
+    fig.legend(legend_handles, [h.get_label() for h in legend_handles],
+               loc='upper right', bbox_to_anchor=(0.98, 0.98),
+               fontsize=10, frameon=True, fancybox=False, shadow=False)
     
-    def add_fig_legend(x_pos, y_pos, label, color):
-        rect = plt.Rectangle((x_pos, y_pos), 0.01, 0.06, 
-                            transform=fig.transFigure, 
-                            facecolor=color, edgecolor='none', clip_on=False)
-        fig.patches.append(rect)
-        fig.text(x_pos + 0.005, y_pos + 0.08, label, 
-                transform=fig.transFigure,
-                rotation=90, va='bottom', ha='center', 
-                fontsize=14, fontweight='bold')
-    
-    # Add legends for each panel
-    add_fig_legend(legend_x_left, legend_y_bot, 'C>A', COLORS_C[0])
-    add_fig_legend(legend_x_right, legend_y_bot, 'T>A', COLORS_T[0])
-    
-    add_fig_legend(legend_x_left, legend_y_mid, 'C>G', COLORS_C[1])
-    add_fig_legend(legend_x_right, legend_y_mid, 'T>C', COLORS_T[1])
-    
-    add_fig_legend(legend_x_left, legend_y_top, 'C>T', COLORS_C[2])
-    add_fig_legend(legend_x_right, legend_y_top, 'T>G', COLORS_T[2])
-    
-    # Add scale indicator showing what 1.0 represents
-    # Place scale on the bottom panel
+    # Add scale indicator below legend (matching user request)
+    # Place scale on the bottom panel, positioned below the legend area
     scale_x_pos = max(x_pos) + 1.5  # Just after the last bar
     scale_height = 1.0
     
@@ -216,9 +218,6 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
                     'k-', linewidth=1.5, clip_on=False)
     
     # Add labels for tick marks
-    #ax_bot.text(scale_x_pos + 0.3, scale_height / 2, '1.0', 
-    #            ha='left', va='center', fontsize=12, fontweight='bold',
-    #            transform=ax_bot.transData)
     ax_bot.text(scale_x_pos + 0.3, 0, '0', 
                 ha='left', va='center', fontsize=10,
                 transform=ax_bot.transData)
@@ -241,7 +240,8 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs):
     return fig
 
 
-def generate_single_reprint(csv_path, reprint_name, output_path):
+def generate_single_reprint(csv_path, reprint_name, output_path, 
+                            show_x_labels=True, show_y_labels=False, title=None):
     """
     Generate a single RePrint plot and save it.
     
@@ -253,16 +253,26 @@ def generate_single_reprint(csv_path, reprint_name, output_path):
         Name of the RePrint to generate (e.g., 'reprint_SBS6')
     output_path : str
         Path where the output PNG will be saved
+    show_x_labels : bool, optional
+        Whether to show X-axis labels (default: True)
+    show_y_labels : bool, optional
+        Whether to show Y-axis labels (default: False)
+    title : str, optional
+        Custom title (default: None)
     """
     df = load_reprint_data(csv_path)
     c_probs, t_probs = extract_reprint_vector(df, reprint_name)
-    fig = plot_reprint_seamless(reprint_name, c_probs, t_probs)
+    fig = plot_reprint_seamless(reprint_name, c_probs, t_probs,
+                               show_x_labels=show_x_labels,
+                               show_y_labels=show_y_labels,
+                               title=title)
     fig.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
     plt.close()
     print(f"Generated: {output_path}")
 
 
-def generate_all_reprints(csv_path, output_pdf=None, output_dir=None):
+def generate_all_reprints(csv_path, output_pdf=None, output_dir=None,
+                          show_x_labels=True, show_y_labels=False):
     """
     Generate RePrint plots for all signatures in the CSV file.
     
@@ -274,6 +284,10 @@ def generate_all_reprints(csv_path, output_pdf=None, output_dir=None):
         Path to output PDF file containing all plots
     output_dir : str, optional
         Directory to save individual PNG files
+    show_x_labels : bool, optional
+        Whether to show X-axis labels (default: True)
+    show_y_labels : bool, optional
+        Whether to show Y-axis labels (default: False)
     """
     print(f"Loading RePrint data from {csv_path}...")
     df = load_reprint_data(csv_path)
@@ -293,7 +307,9 @@ def generate_all_reprints(csv_path, output_pdf=None, output_dir=None):
                 
                 try:
                     c_probs, t_probs = extract_reprint_vector(df, reprint_name)
-                    fig = plot_reprint_seamless(reprint_name, c_probs, t_probs)
+                    fig = plot_reprint_seamless(reprint_name, c_probs, t_probs,
+                                               show_x_labels=show_x_labels,
+                                               show_y_labels=show_y_labels)
                     
                     # Save to PDF
                     pdf.savefig(fig, dpi=150, bbox_inches='tight', facecolor='white')
@@ -319,7 +335,9 @@ def generate_all_reprints(csv_path, output_pdf=None, output_dir=None):
             
             try:
                 c_probs, t_probs = extract_reprint_vector(df, reprint_name)
-                fig = plot_reprint_seamless(reprint_name, c_probs, t_probs)
+                fig = plot_reprint_seamless(reprint_name, c_probs, t_probs,
+                                           show_x_labels=show_x_labels,
+                                           show_y_labels=show_y_labels)
                 
                 png_path = f"{output_dir}/{reprint_name}_seamless.png"
                 fig.savefig(png_path, dpi=300, bbox_inches='tight', facecolor='white')

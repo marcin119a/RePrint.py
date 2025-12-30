@@ -5,9 +5,46 @@ from matplotlib.backends.backend_pdf import PdfPages
 import os
 
 
-def create_main_dashboard(df, signature, title, yaxis_title):
+def format_context_label(context):
+    """
+    Format context label to match plot_static.py style.
+    Converts 'A[C>A]A' or 'ACA' to 'A$\\mathbf{C}$A' format.
+    """
+    if '[' in context and ']' in context:
+        # Format: 'A[C>A]A' -> extract left, center, right
+        parts = context.split('[')
+        left = parts[0]
+        mutation_and_right = parts[1].split(']')
+        center = mutation_and_right[0].split('>')[0]  # Get ref base (C or T)
+        right = mutation_and_right[1]
+    else:
+        # Format: 'ACA' -> extract left, center, right
+        left = context[0]
+        center = context[1]
+        right = context[2]
+    
+    return f'{left}$\\mathbf{{{center}}}${right}'
+
+
+def create_main_dashboard(df, signature, title, yaxis_title, 
+                          show_x_labels=True, show_y_labels=True):
     """
     Original vertical bar chart implementation using matplotlib.
+    
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        DataFrame with signatures as columns
+    signature : str
+        Name of the signature column
+    title : str
+        Title for the plot
+    yaxis_title : str
+        Title for y-axis
+    show_x_labels : bool, optional
+        Whether to show X-axis labels (default: True)
+    show_y_labels : bool, optional
+        Whether to show Y-axis labels (default: True)
     """
     frequencies = df[signature] * 1
 
@@ -45,12 +82,28 @@ def create_main_dashboard(df, signature, title, yaxis_title):
     y_max = frequencies.max()
 
     ax.set_title(title, fontsize=14, pad=20)
-    ax.set_xlabel('Mutation Context', fontsize=12)
-    ax.set_ylabel(yaxis_title, fontsize=12)
-    ax.set_xticks(x_pos)
-    ax.set_xticklabels(contexts, rotation=90, ha='right', fontsize=8)
+    
+    if show_x_labels:
+        ax.set_xlabel('Mutation Context', fontsize=12)
+        ax.set_xticks(x_pos)
+        # Format labels to match plot_static.py style (A$\mathbf{C}$A)
+        formatted_labels = [format_context_label(ctx) for ctx in contexts]
+        ax.set_xticklabels(formatted_labels, rotation=90, ha='right', fontsize=8)
+    else:
+        ax.set_xlabel('')
+        ax.set_xticks([])
+        ax.set_xticklabels([])
+    
+    if show_y_labels:
+        ax.set_ylabel(yaxis_title, fontsize=12)
+    else:
+        ax.set_ylabel('')
+        ax.set_yticks([])
+        ax.set_yticklabels([])
+    
     ax.set_ylim(0, y_max * 1.05)
-    ax.legend(title='Mutation Type', fontsize=10, title_fontsize=11)
+    # Legend without title (matching user request)
+    ax.legend(fontsize=10, title=None)
     ax.grid(axis='y', alpha=0.3, linestyle='--')
     
     plt.tight_layout()
@@ -185,7 +238,9 @@ def create_main_dashboard_horizontal(df, signature, title, yaxis_title):
 
     # Update x-axis (only for bottom subplot)
     axes[-1].set_xticks(x_pos)
-    axes[-1].set_xticklabels(context_order, rotation=90, ha='right', fontsize=8)
+    # Format labels to match plot_static.py style (A$\mathbf{C}$A)
+    formatted_labels = [format_context_label(ctx) for ctx in context_order]
+    axes[-1].set_xticklabels(formatted_labels, rotation=90, ha='right', fontsize=8)
     axes[-1].spines['top'].set_visible(False)
     axes[-1].spines['right'].set_visible(False)
     axes[-1].spines['left'].set_visible(False)
@@ -215,8 +270,9 @@ def create_main_dashboard_horizontal(df, signature, title, yaxis_title):
             unique_handles.append(h)
             unique_labels.append(l)
     
-    fig.legend(unique_handles, unique_labels, title="Mutation Type", 
-               loc='upper right', bbox_to_anchor=(1.02, 1), fontsize=10, title_fontsize=11)
+    # Legend without title (matching user request)
+    fig.legend(unique_handles, unique_labels, title=None,
+               loc='upper right', bbox_to_anchor=(1.02, 1), fontsize=10)
     
     plt.suptitle(title, fontsize=14, y=0.98)
     
