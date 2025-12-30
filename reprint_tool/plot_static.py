@@ -163,11 +163,11 @@ def plot_reprint_seamless(reprint_name, c_probs, t_probs,
             left = label[0]
             center = label[1]
             right = label[2]
-            formatted = f'{left}$\\mathbf{{{center}}}${right}'
+            formatted = f'{left}{center}{right}'
             x_labels_formatted.append(formatted)
         
         ax_bot.set_xticks(x_pos)
-        ax_bot.set_xticklabels(x_labels_formatted, rotation=90, ha='right', fontsize=8)
+        ax_bot.set_xticklabels(x_labels_formatted, rotation=90, ha='right', fontsize=8, family='monospace')
         ax_bot.tick_params(axis='x', length=0)
     else:
         ax_bot.set_xticks([])
