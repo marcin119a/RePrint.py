@@ -7,8 +7,8 @@ import os
 
 def format_context_label(context):
     """
-    Format context label to match plot_static.py style.
-    Converts 'A[C>A]A' or 'ACA' to 'A$\\mathbf{C}$A' format.
+    Format context label - simple format without bold.
+    Converts 'A[C>A]A' or 'ACA' to 'ACA' format.
     """
     if '[' in context and ']' in context:
         # Format: 'A[C>A]A' -> extract left, center, right
@@ -23,11 +23,12 @@ def format_context_label(context):
         center = context[1]
         right = context[2]
     
-    return f'{left}$\\mathbf{{{center}}}${right}'
+    return f'{left}{center}{right}'
 
 
 def create_main_dashboard(df, signature, title, yaxis_title, 
-                          show_x_labels=True, show_y_labels=True):
+                          show_x_labels=True, show_y_labels=True,
+                          figsize=None):
     """
     Original vertical bar chart implementation using matplotlib.
     
@@ -45,6 +46,8 @@ def create_main_dashboard(df, signature, title, yaxis_title,
         Whether to show X-axis labels (default: True)
     show_y_labels : bool, optional
         Whether to show Y-axis labels (default: True)
+    figsize : tuple of float, optional
+        Figure size (width, height) in inches. Default: (16, 5) for better X-axis visibility
     """
     frequencies = df[signature] * 1
 
@@ -61,7 +64,9 @@ def create_main_dashboard(df, signature, title, yaxis_title,
         'T>G': 'pink'
     }
 
-    fig, ax = plt.subplots(figsize=(14, 6))
+    if figsize is None:
+        figsize = (16, 5)  # Wider aspect ratio for better X-axis visibility
+    fig, ax = plt.subplots(figsize=figsize)
     
     # Calculate positions for bars
     n_contexts = len(contexts)
@@ -86,9 +91,9 @@ def create_main_dashboard(df, signature, title, yaxis_title,
     if show_x_labels:
         ax.set_xlabel('Mutation Context', fontsize=12)
         ax.set_xticks(x_pos)
-        # Format labels to match plot_static.py style (A$\mathbf{C}$A)
+        # Format labels (simple format)
         formatted_labels = [format_context_label(ctx) for ctx in contexts]
-        ax.set_xticklabels(formatted_labels, rotation=90, ha='right', fontsize=8)
+        ax.set_xticklabels(formatted_labels, rotation=90, ha='right', fontsize=8, family='monospace')
     else:
         ax.set_xlabel('')
         ax.set_xticks([])
@@ -110,7 +115,7 @@ def create_main_dashboard(df, signature, title, yaxis_title,
     return fig
 
 
-def create_main_dashboard_horizontal(df, signature, title, yaxis_title):
+def create_main_dashboard_horizontal(df, signature, title, yaxis_title, figsize=None):
     """
     Horizontal bar chart with 3 rows, each showing a pair of complementary mutations.
     Each row has 2 groups of 16 bars (C-centered and T-centered contexts).
@@ -120,6 +125,19 @@ def create_main_dashboard_horizontal(df, signature, title, yaxis_title):
     - C>A (light blue, left 16) + T>A (gray, right 16)
     
     X-axis shows 32 trinucleotide contexts: first 16 (ACA-TCT) then last 16 (ATA-TTT)
+    
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        DataFrame with signatures as columns
+    signature : str
+        Name of the signature column
+    title : str
+        Title for the plot
+    yaxis_title : str
+        Title for y-axis
+    figsize : tuple of float, optional
+        Figure size (width, height) in inches. Default: (16, 6) for better X-axis visibility
     """
     frequencies = df[signature] * 1
 
@@ -183,9 +201,11 @@ def create_main_dashboard_horizontal(df, signature, title, yaxis_title):
     y_range = max(abs(y_min), abs(y_max)) * 1.1  # Add 10% padding
 
     # Create subplots with 3 rows, one for each mutation pair
+    if figsize is None:
+        figsize = (16, 6)  # Wider aspect ratio for better X-axis visibility
     fig, axes = plt.subplots(
         len(mutation_pairs), 1,
-        figsize=(14, 8),
+        figsize=figsize,
         sharex=True,
         gridspec_kw={'hspace': 0.05}
     )
@@ -238,9 +258,9 @@ def create_main_dashboard_horizontal(df, signature, title, yaxis_title):
 
     # Update x-axis (only for bottom subplot)
     axes[-1].set_xticks(x_pos)
-    # Format labels to match plot_static.py style (A$\mathbf{C}$A)
+    # Format labels (simple format)
     formatted_labels = [format_context_label(ctx) for ctx in context_order]
-    axes[-1].set_xticklabels(formatted_labels, rotation=90, ha='right', fontsize=8)
+    axes[-1].set_xticklabels(formatted_labels, rotation=90, ha='right', fontsize=8, family='monospace')
     axes[-1].spines['top'].set_visible(False)
     axes[-1].spines['right'].set_visible(False)
     axes[-1].spines['left'].set_visible(False)
@@ -282,10 +302,23 @@ def create_main_dashboard_horizontal(df, signature, title, yaxis_title):
     return fig
 
 
-def save_all_signatures_to_pdf(df, output_dir=".", prefix="reprint_", yaxis_title="Probabilities"):
+def save_all_signatures_to_pdf(df, output_dir=".", prefix="reprint_", yaxis_title="Probabilities", figsize=None):
     """
     Creates and saves PDF plots for all signatures in the DataFrame.
     Each signature is saved as a separate PDF file.
+    
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        DataFrame with signatures as columns
+    output_dir : str, optional
+        Directory to save PDF files (default: ".")
+    prefix : str, optional
+        Prefix for output PDF files (default: "reprint_")
+    yaxis_title : str, optional
+        Title for y-axis (default: "Probabilities")
+    figsize : tuple of float, optional
+        Figure size (width, height) in inches. Default: (16, 5) for better X-axis visibility
     """
     os.makedirs(output_dir, exist_ok=True)
     for signature in df.columns:
@@ -293,7 +326,8 @@ def save_all_signatures_to_pdf(df, output_dir=".", prefix="reprint_", yaxis_titl
             df,
             signature=signature,
             title=f"{prefix}{signature} - Probabilities of Specific Tri-nucleotide Context Mutations",
-            yaxis_title=yaxis_title
+            yaxis_title=yaxis_title,
+            figsize=figsize
         )
         pdf_path = os.path.join(output_dir, f"{prefix}{signature}.pdf")
         fig.savefig(pdf_path, format="pdf", bbox_inches='tight', dpi=300)
@@ -301,7 +335,7 @@ def save_all_signatures_to_pdf(df, output_dir=".", prefix="reprint_", yaxis_titl
         print(f"Saved: {pdf_path}")
 
 
-def save_all_signatures_to_single_pdf(df, output_pdf, prefix="", yaxis_title="Probabilities"):
+def save_all_signatures_to_single_pdf(df, output_pdf, prefix="", yaxis_title="Probabilities", figsize=None):
     """
     Creates and saves all signature plots in a single PDF file.
     
@@ -315,6 +349,8 @@ def save_all_signatures_to_single_pdf(df, output_pdf, prefix="", yaxis_title="Pr
         Prefix for signature names in titles
     yaxis_title : str
         Title for y-axis
+    figsize : tuple of float, optional
+        Figure size (width, height) in inches. Default: (16, 5) for better X-axis visibility
     """
     print(f"\nCombining {len(df.columns)} plots into PDF...")
     with PdfPages(output_pdf) as pdf:
@@ -325,7 +361,8 @@ def save_all_signatures_to_single_pdf(df, output_pdf, prefix="", yaxis_title="Pr
                     df,
                     signature=signature,
                     title=f"{prefix}{signature} - Probabilities of Specific Tri-nucleotide Context Mutations by Mutation Type",
-                    yaxis_title=yaxis_title
+                    yaxis_title=yaxis_title,
+                    figsize=figsize
                 )
                 
                 # Save to PDF with high DPI
