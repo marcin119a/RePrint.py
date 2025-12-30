@@ -12,9 +12,6 @@ readme = "README.md"
 dependencies = [
     "numpy",
     "pandas",
-    "plotly",
-    "kaleido",
-    "Pillow",
     "scipy",
     "matplotlib"
 ]

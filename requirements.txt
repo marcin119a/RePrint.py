@@ -1,7 +1,5 @@
 numpy
 pandas
-plotly
-kaleido
 Pillow
 scipy
 matplotlib

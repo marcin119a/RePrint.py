@@ -13,7 +13,7 @@ import pandas as pd
 import os
 import sys
 from reprint_tool.core import reprint
-from reprint_tool.plot import save_all_signatures_to_pdf, save_all_signatures_to_single_pdf
+from reprint_tool.plot import save_all_signatures_to_single_pdf
 from reprint_tool.plot_static import generate_all_reprints
 
 def main():
@@ -60,7 +60,7 @@ def main():
     
     # Generate standard signature plots (using plot.py)
     print("=" * 60)
-    print("STEP 3: Generating standard signature plots (plotly)")
+    print("STEP 3: Generating standard signature plots")
     print("=" * 60)
     signature_output_dir = f'signature_plots_{base_name}'
     os.makedirs(signature_output_dir, exist_ok=True)

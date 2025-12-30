@@ -1,6 +1,7 @@
 import argparse
 import os
 import pandas as pd
+import matplotlib.pyplot as plt
 from reprint_tool.plot import save_all_signatures_to_pdf, create_main_dashboard
 from reprint_tool.core import reprint
 from reprint_tool.analyze import (
@@ -49,7 +50,8 @@ def main():
                 yaxis_title="Probabilities",
             )
             png_path = os.path.join(args.output_dir, f"{args.prefix}{signature}.png")
-            fig.write_image(png_path, format="png", scale=2)
+            fig.savefig(png_path, format="png", dpi=200, bbox_inches='tight')
+            plt.close(fig)
             print(f"Saved: {png_path}")
 
     if args.analyze_png:
@@ -63,7 +65,8 @@ def main():
         )
         out_path = args.analyze_png
         os.makedirs(os.path.dirname(out_path) or '.', exist_ok=True)
-        fig.write_image(out_path, format='png', scale=2)
+        fig.savefig(out_path, format='png', dpi=200, bbox_inches='tight')
+        plt.close(fig)
         print(f"Saved analyze heatmap: {out_path}")
 
 
