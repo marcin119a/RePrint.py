@@ -24,7 +24,7 @@ You need Python 3.8 or newer.
 Install dependencies:
 
 ```bash
-pip install numpy pandas plotly kaleido Pillow  scipy
+pip install numpy pandas  scipy
 ```
 
 For development and testing:
