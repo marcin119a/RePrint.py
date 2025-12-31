@@ -25,8 +25,20 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install numpy pandas pytest scipy
+        pip install ".[dev]"
 
-    - name: Run tests
+    - name: Lint with ruff
       run: |
-        pytest
+        echo "Running ruff check..."
+        ruff check . --show-source --statistics
+      continue-on-error: true
+    
+    - name: Lint with flake8
+      run: |
+        echo "Running flake8 check..."
+        flake8 . --count --show-source --statistics
+      continue-on-error: true
+
+    - name: Run tests with coverage
+      run: |
+        pytest --cov=reprint_tool --cov-report=xml --cov-report=term-missing
