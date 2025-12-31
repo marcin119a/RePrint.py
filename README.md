@@ -2,6 +2,9 @@
 
 **Tool to compute DNA Repair FootPrint (RePrint) from COSMIC signatures and visualize the results as publication-ready PDF plots.**
 
+![Tests](https://github.com/marcin119a/RePrint.py/actions/workflows/python-tests.yml/badge.svg)
+
+
 ## Features
 
 - Computes RePrint (DNA repair footprint) from input signature matrices (e.g., COSMIC).
@@ -19,7 +22,6 @@ Try the interactive demo on Google Colab:
 
 ## Installation
 
-You need Python 3.8 or newer.
 
 Install dependencies:
 

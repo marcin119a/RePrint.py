@@ -2,12 +2,16 @@ import numpy as np
 import pandas as pd
 from scipy.spatial.distance import squareform
 from scipy.cluster.hierarchy import linkage, dendrogram
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib import cm
 
 def normalize(x):
-    return (x - np.nanmean(x)) / np.nanstd(x)
+    std = np.nanstd(x)
+    if std == 0 or np.isnan(std):
+        return np.full_like(x, np.nan, dtype=np.float64)
+    return (x - np.nanmean(x)) / std
 
 def calculate_rmse(x, y):
     x_normalized = normalize(x)
@@ -132,11 +136,18 @@ def create_heatmap_with_custom_sim(df, calc_func=calculate_rmse, colorscale='Blu
         # Main heatmap
         ax_heatmap = fig.add_subplot(gs[1, 1])
         
-        # Get colormap
+        # Get colormap (using new matplotlib API if available)
         try:
-            cmap = cm.get_cmap(colorscale)
-        except:
-            cmap = cm.get_cmap('Blues')  # Fallback
+            if hasattr(matplotlib, 'colormaps'):
+                cmap = matplotlib.colormaps[colorscale]
+            else:
+                cmap = cm.get_cmap(colorscale)
+        except (KeyError, ValueError, AttributeError):
+            # Fallback to Blues
+            if hasattr(matplotlib, 'colormaps'):
+                cmap = matplotlib.colormaps['Blues']
+            else:
+                cmap = cm.get_cmap('Blues')
         
         # Reverse colormap if needed (similar to reversescale=True in plotly)
         im = ax_heatmap.imshow(heat_data, aspect='auto', origin='lower', 
