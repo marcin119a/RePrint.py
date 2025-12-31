@@ -93,7 +93,7 @@ def create_main_dashboard(df, signature, title, yaxis_title,
         ax.set_xticks(x_pos)
         # Format labels (simple format)
         formatted_labels = [format_context_label(ctx) for ctx in contexts]
-        ax.set_xticklabels(formatted_labels, rotation=90, ha='right', fontsize=8, family='monospace')
+        ax.set_xticklabels(formatted_labels, rotation=90, ha='center', fontsize=8, family='monospace')
     else:
         ax.set_xlabel('')
         ax.set_xticks([])
@@ -260,7 +260,7 @@ def create_main_dashboard_horizontal(df, signature, title, yaxis_title, figsize=
     axes[-1].set_xticks(x_pos)
     # Format labels (simple format)
     formatted_labels = [format_context_label(ctx) for ctx in context_order]
-    axes[-1].set_xticklabels(formatted_labels, rotation=90, ha='right', fontsize=8, family='monospace')
+    axes[-1].set_xticklabels(formatted_labels, rotation=90, ha='center', fontsize=8, family='monospace')
     axes[-1].spines['top'].set_visible(False)
     axes[-1].spines['right'].set_visible(False)
     axes[-1].spines['left'].set_visible(False)
